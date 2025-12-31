@@ -1,0 +1,67 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"log/slog"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/student-ankitpandit/rest-api/internal/config"
+)
+
+func main() {
+	//load config
+	cfg := config.MustLoad()
+
+	//db setup
+	//setup router
+	router := http.NewServeMux() //this is basically a router 
+
+	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("welcome to students api"))
+	})
+	//server server
+
+	server := http.Server{
+		Addr: cfg.Addr,
+		Handler: router,
+	}
+
+	fmt.Printf("Server started %s", cfg.HTTPServer.Addr)
+
+
+	done := make(chan os.Signal, 1)
+
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	//new go routine
+	go func () {
+		err := server.ListenAndServe()
+		if(err != nil) {
+			log.Fatal("Failed to start server")
+		}
+	}()
+
+	<-done
+
+	//logic to close/kill the server
+	slog.Info("shutting down server")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+
+	// err := server.Shutdown(ctx)
+	// if(err != nil) {
+	// 	slog.Info("Failed to shutdown server", slog.String("error", err.Error()))
+	// }
+	if err := server.Shutdown(ctx); (err != nil) {
+		slog.Info("Failed to shutdown server", slog.String("error", err.Error()))
+	}
+
+	slog.Info("Server shutdowned safely")
+}

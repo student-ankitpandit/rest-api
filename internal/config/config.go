@@ -8,14 +8,14 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-type HttpServer struct {
-	Address string
+type HTTPServer struct {
+	Addr string `yaml:"address" env-required:"true"`
 }
 
 type Config struct {
-	Env         string `yaml:"env" env:"ENV" env-required:"true"`
+	Env         string `yaml:"env" env:"ENV" env-required:"true" env-default:"prod"`
 	StoragePath string `yaml:"storage_path" env-required:"true"`
-	HttpServer  string `yaml:"http_server"`
+	HTTPServer  `yaml:"http_server"`
 }
 
 func MustLoad() *Config {
@@ -31,7 +31,7 @@ func MustLoad() *Config {
 		configPath = *flags
 
 		if configPath == "" {
-			log.Fatal("config path is not set")
+			log.Fatal("config path is not set yet")
 		}
 	}
 

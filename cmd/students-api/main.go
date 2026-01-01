@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/student-ankitpandit/rest-api/http/handlers/student"
 	"github.com/student-ankitpandit/rest-api/internal/config"
 )
 
@@ -22,9 +23,7 @@ func main() {
 	//setup router
 	router := http.NewServeMux() //this is basically a router 
 
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome to students api"))
-	})
+	router.HandleFunc("POST /api/students", student.New())
 	//server server
 
 	server := http.Server{

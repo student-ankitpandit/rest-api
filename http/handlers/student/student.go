@@ -9,13 +9,14 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator"
+	"github.com/student-ankitpandit/rest-api/internal/storage"
 	"github.com/student-ankitpandit/rest-api/internal/types"
 	"github.com/student-ankitpandit/rest-api/internal/utils/response"
 )
 
 
 
-func New() http.HandlerFunc {
+func New(storage storage.Storage) http.HandlerFunc { //this is called dependency injection
 	return func(w http.ResponseWriter, r *http.Request) {
 		slog.Info("creating a student")
 		
@@ -44,9 +45,20 @@ func New() http.HandlerFunc {
 			return 
 		}
 		
+		lastId, err := storage.CreateStudent(
+			student.Name,
+			student.Email,
+			student.Age,
+		)
+	
+		slog.Info("user created successfully", slog.String("userId", fmt.Sprint(lastId)))
 
+		if(err != nil) {
+			response.WriteJson(w, http.StatusInternalServerError, err)
+			return 
+		}
 
-		response.WriteJson(w, http.StatusCreated, map[string]string{"success": "true"})
+		response.WriteJson(w, http.StatusCreated, map[string]int64{"id": lastId})
 	}
 
 	

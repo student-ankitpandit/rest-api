@@ -13,6 +13,7 @@ import (
 
 	"github.com/student-ankitpandit/rest-api/http/handlers/student"
 	"github.com/student-ankitpandit/rest-api/internal/config"
+	"github.com/student-ankitpandit/rest-api/internal/storage/sqlite"
 )
 
 func main() {
@@ -20,10 +21,16 @@ func main() {
 	cfg := config.MustLoad()
 
 	//db setup
+	storage, err := sqlite.New(cfg)
+	if(err != nil) {
+		log.Fatal(err)
+	}
+
+	slog.Info("storgae initialized", slog.String("current env is ", cfg.Env), slog.String("version", "1.0.0"))
 	//setup router
 	router := http.NewServeMux() //this is basically a router 
 
-	router.HandleFunc("POST /api/students", student.New())
+	router.HandleFunc("POST /api/students", student.New(storage))
 	//server server
 
 	server := http.Server{

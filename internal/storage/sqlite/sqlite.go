@@ -2,9 +2,11 @@ package sqlite
 
 import (
 	"database/sql"
+	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/student-ankitpandit/rest-api/internal/config"
+	"github.com/student-ankitpandit/rest-api/internal/types"
 )
 
 type Sqlite struct {
@@ -36,7 +38,7 @@ func New(cfg *config.Config) (*Sqlite, error) {
 }
 
 func (s *Sqlite)CreateStudent(name string, email string, age int) (int64, error)  {
-	stmt, err := s.Db.Prepare("INSERTS INTO STUDENTS (name, email, password) VALUES (?, ?, ?)")
+	stmt, err := s.Db.Prepare("INSERT INTO STUDENTS (name, email, age) VALUES (?, ?, ?)")
 	if(err != nil) {
 		return 0, err
 	}
@@ -54,4 +56,25 @@ func (s *Sqlite)CreateStudent(name string, email string, age int) (int64, error)
 	}
 
 	return lastId, nil
+}
+
+func (s * Sqlite) GetStudentsById(id int64) (types.Student, error) {
+	stmt, err := s.Db.Prepare("SELECT id, name, email, age FROM students WHERE id = ? LIMIT 1")
+	if(err != nil) {
+		return types.Student{}, err
+	}
+
+	defer stmt.Close()
+
+	//serializing the data into a struct
+
+	var student types.Student
+
+	err = stmt.QueryRow(id).Scan(student.Id, student.Name, student.Email, student.Age)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return types.Student{}, fmt.Errorf("no user found with id %s", fmt.Sprint(id))
+		}
+		return types.Student{}, fmt.Errorf("query error %w", err)
+	}
 }

@@ -28,9 +28,10 @@ func main() {
 
 	slog.Info("storgae initialized", slog.String("current env is ", cfg.Env), slog.String("version", "1.0.0"))
 	//setup router
-	router := http.NewServeMux() //this is basically a router 
+	router := http.NewServeMux() //this is basically a router
 
 	router.HandleFunc("POST /api/students", student.New(storage))
+	router.HandleFunc("GET /api/students/{id}", student.GetStudentsById(storage))
 	//server server
 
 	server := http.Server{

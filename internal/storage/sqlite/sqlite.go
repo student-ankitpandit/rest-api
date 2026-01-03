@@ -58,7 +58,7 @@ func (s *Sqlite)CreateStudent(name string, email string, age int) (int64, error)
 	return lastId, nil
 }
 
-func (s * Sqlite) GetStudentsById(id int64) (types.Student, error) {
+func (s * Sqlite) GetStudentById(id int64) (types.Student, error) {
 	stmt, err := s.Db.Prepare("SELECT id, name, email, age FROM students WHERE id = ? LIMIT 1")
 	if(err != nil) {
 		return types.Student{}, err
@@ -77,9 +77,10 @@ func (s * Sqlite) GetStudentsById(id int64) (types.Student, error) {
 		}
 		return types.Student{}, fmt.Errorf("query error %w", err)
 	}
+	return student, nil
 }
 
-func (s *Sqlite) GetStudentsList() ([]types.Student, error) {
+func (s *Sqlite) GetStudents() ([]types.Student, error) {
 	stmt, err := s.Db.Prepare("SELECT id, name, email, age FROM students")
 	if err != nil {
 		return nil, err
@@ -105,6 +106,6 @@ func (s *Sqlite) GetStudentsList() ([]types.Student, error) {
 		}
 
 		students = append(students, student)
-		return students, nil
 	}
+	return students, nil
 }

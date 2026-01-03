@@ -10,7 +10,6 @@ import (
 	"strconv"
 
 	"github.com/go-playground/validator"
-	"github.com/student-ankitpandit/rest-api/http/handlers/student"
 	"github.com/student-ankitpandit/rest-api/internal/storage"
 	"github.com/student-ankitpandit/rest-api/internal/types"
 	"github.com/student-ankitpandit/rest-api/internal/utils/response"
@@ -63,7 +62,7 @@ func New(storage storage.Storage) http.HandlerFunc { //this is called dependency
 	}
 }
 
-func GetStudentsById(storage storage.Storage) http.HandlerFunc {
+func GetById(storage storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
 		slog.Info("getting a user through their id", slog.String("id", id))
@@ -74,7 +73,7 @@ func GetStudentsById(storage storage.Storage) http.HandlerFunc {
 			response.WriteJson(w, http.StatusBadRequest, response.GeneralErr(err))
 			return 
 		}
-		student, err := storage.GetStudentsById(intId)
+		student, err := storage.GetStudentById(intId)
 		if err != nil {
 			slog.Error("error getting user", slog.String("id", id))
 			response.WriteJson(w, http.StatusInternalServerError, response.GeneralErr(err))
@@ -89,7 +88,7 @@ func GetList(storage storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slog.Info("getting all students")
 
-		students, err := storage.GetStudentsList()
+		students, err := storage.GetStudents()
 		if err != nil {
 			response.WriteJson(w, http.StatusInternalServerError, err)
 			return 

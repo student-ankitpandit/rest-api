@@ -32,7 +32,7 @@ func main() {
 
 	router.HandleFunc("POST /api/students", student.New(storage))
 	router.HandleFunc("GET /api/students/{id}", student.GetStudentsById(storage))
-	router.HandleFunc("GET /api/students", student.GetList(storage))
+	router.HandleFunc("GET /api/students", student.GetListm(storage))
 	//server server
 
 	server := http.Server{
@@ -73,3 +73,4 @@ func main() {
 
 	slog.Info("Server shutdowned safely")
 }
+
